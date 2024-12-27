@@ -1,65 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-    }
-    .image-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .image-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 5px;
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-  </style>
-</head>
-<body>
-  <h1>Admin Panel</h1>
-  <div class="image-grid" id="imageGrid"></div>
+const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
+const repoName = 'ecom-db'; // Replace with your repository name
+const jsonPath = 'selected-image.json'; // Replace with your JSON file path
+const branch = 'main'; // Replace with your branch name
+const token = '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'; // Replace with a GitHub personal access token
+const folderPath = 'images'; // Folder path where your images are stored
 
-  <script>const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
-    const repoName = 'ecom-db'; // Replace with your repository name
-    const jsonPath = 'selected-image.json'; // Replace with your JSON file path
-    const branch = 'main'; // Replace with your branch name
-    const token = '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'; // Replace with a GitHub personal access token
-const folderPath = 'images'; // Assuming images are in the "images" folder
+const imageGrid = document.getElementById('imageGrid');
 
-    const imageGrid = document.getElementById('imageGrid');
-
-    async function fetchGitHubFiles() {
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}?ref=${branch}`;
+async function fetchGitHubFiles() {
+  // Fetch files from the "images" folder in the repository
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}?ref=${branch}`;
   try {
     const response = await fetch(url);
     if (!response.ok) {
@@ -73,51 +23,48 @@ const folderPath = 'images'; // Assuming images are in the "images" folder
   }
 }
 
+function displayImages(files) {
+  files.forEach(file => {
+    if (file.type === 'file' && file.download_url) {
+      const card = document.createElement('div');
+      card.className = 'image-card';
 
-    function displayImages(files) {
-      files.forEach(file => {
-        if (file.type === 'file' && file.download_url) {
-          const card = document.createElement('div');
-          card.className = 'image-card';
+      const img = document.createElement('img');
+      img.src = file.download_url;
+      img.alt = file.name;
 
-          const img = document.createElement('img');
-          img.src = file.download_url;
-          img.alt = file.name;
+      const button = document.createElement('button');
+      button.textContent = 'Set as Homepage Image';
+      button.onclick = () => updateSelectedImage(file.download_url);
 
-          const button = document.createElement('button');
-          button.textContent = 'Set as Homepage Image';
-          button.onclick = () => updateSelectedImage(file.download_url);
-
-          card.appendChild(img);
-          card.appendChild(button);
-          imageGrid.appendChild(card);
-        }
-      });
+      card.appendChild(img);
+      card.appendChild(button);
+      imageGrid.appendChild(card);
     }
+  });
+}
 
-    async function updateSelectedImage(imageUrl) {
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${jsonPath}`;
-      const base64Content = btoa(JSON.stringify({ imageUrl }));
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: 'Update selected image',
-          content: base64Content,
-          branch,
-        }),
-      });
-      if (response.ok) {
-        alert('Homepage image updated!');
-      } else {
-        alert('Failed to update the image.');
-      }
-    }
+async function updateSelectedImage(imageUrl) {
+  // Corrected variable names to match the declared ones
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}`;
+  const base64Content = btoa(JSON.stringify({ imageUrl }));
+  const response = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      'Authorization': `token ${token}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      message: 'Update selected image',
+      content: base64Content,
+      branch,
+    }),
+  });
+  if (response.ok) {
+    alert('Homepage image updated!');
+  } else {
+    alert('Failed to update the image.');
+  }
+}
 
-    fetchGitHubFiles();
-  </script>
-</body>
-</html>
+fetchGitHubFiles();
