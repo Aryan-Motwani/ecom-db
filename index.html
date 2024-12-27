@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GitHub Images List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      margin: 10px 0;
+    }
+    .file-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .file-list img {
+      width: 150px;
+      height: auto;
+      object-fit: cover;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>GitHub Images List</h1>
+  <div class="file-list" id="fileList"></div>
+  <div class="error" id="error"></div>
+
+  <script>
+    const owner = 'Aryan-Motwani'; // Replace with your GitHub username
+    const repo = 'ecom-db'; // Replace with your repository name
+    const folderPath = 'images'; // Replace with your folder path
+    const branch = 'main'; // Replace with your branch (e.g., main or master)
+
+    async function fetchGitHubFiles() {
+      const fileList = document.getElementById('fileList');
+      const errorDiv = document.getElementById('error');
+      errorDiv.textContent = ''; // Clear previous errors
+
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}?ref=${branch}`;
+
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch files. Make sure the repository, folder, and branch are correct.');
+        }
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          data.forEach(file => {
+            if (file.type === 'file' && file.download_url) {
+              const img = document.createElement('img');
+              img.src = file.download_url;
+              img.alt = file.name;
+              fileList.appendChild(img);
+            }
+          });
+        } else {
+          throw new Error('No files found in the specified folder.');
+        }
+      } catch (error) {
+        errorDiv.textContent = error.message;
+      }
+    }
+
+    fetchGitHubFiles();
+  </script>
+</body>
+</html>
