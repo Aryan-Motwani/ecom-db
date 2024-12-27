@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .image-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <div class="image-grid" id="imageGrid"></div>
+
+  <script>
+    const owner = 'your-username'; // Replace with your GitHub username
+    const repo = 'your-repository'; // Replace with your repository name
+    const folderPath = 'images'; // Replace with your folder path
+    const branch = 'main'; // Replace with your branch (e.g., main or master)
+
+    const imageGrid = document.getElementById('imageGrid');
+
+    async function fetchGitHubFiles() {
+      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}?ref=${branch}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch images.');
+        }
+        const files = await response.json();
+        displayImages(files);
+      } catch (error) {
+        console.error(error);
+        imageGrid.textContent = 'Failed to load images.';
+      }
+    }
+
+    function displayImages(files) {
+      files.forEach(file => {
+        if (file.type === 'file' && file.download_url) {
+          const card = document.createElement('div');
+          card.className = 'image-card';
+
+          const img = document.createElement('img');
+          img.src = file.download_url;
+          img.alt = file.name;
+
+          const button = document.createElement('button');
+          button.textContent = 'Set as Homepage Image';
+          button.onclick = () => setHomepageImage(file.download_url);
+
+          card.appendChild(img);
+          card.appendChild(button);
+          imageGrid.appendChild(card);
+        }
+      });
+    }
+
+    function setHomepageImage(url) {
+      localStorage.setItem('selectedImage', url);
+      alert('Homepage image updated!');
+    }
+
+    fetchGitHubFiles();
+  </script>
+</body>
+</html>
