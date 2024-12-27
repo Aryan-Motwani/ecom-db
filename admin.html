@@ -50,77 +50,83 @@
   <div class="image-grid" id="imageGrid"></div>
 
   <script>
-    const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
-const repoName = 'ecom-db'; // Replace with your repository name
-const jsonPath = 'selected-image.json'; // Replace with your JSON file path
-const branch = 'main'; // Replace with your branch name
-const token = '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'; // Replace with a GitHub personal access token
-const folderPath = 'images'; // Folder path where your images are stored
+    const repoOwner = 'aryan-motwani';  // Replace with your GitHub username
+    const repoName = 'ecom-db';         // Replace with your repository name
+    const jsonPath = 'selected-image.json'; // Path to the JSON file
+    const branch = 'main';              // Replace with your branch name
+    const token = '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'; // Replace with your GitHub token
+    const folderPath = 'images';        // Folder path where your images are stored
 
-const imageGrid = document.getElementById('imageGrid');
+    const imageGrid = document.getElementById('imageGrid');
 
-async function fetchGitHubFiles() {
-  // Fetch files from the "images" folder in the repository
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}?ref=${branch}`;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error('Failed to fetch images.');
+    async function fetchGitHubFiles() {
+      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${folderPath}?ref=${branch}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch images.');
+        }
+        const files = await response.json();
+        displayImages(files);
+      } catch (error) {
+        console.error(error);
+        imageGrid.textContent = 'Failed to load images.';
+      }
     }
-    const files = await response.json();
-    displayImages(files);
-  } catch (error) {
-    console.error(error);
-    imageGrid.textContent = 'Failed to load images.';
-  }
-}
 
-function displayImages(files) {
-  files.forEach(file => {
-    if (file.type === 'file' && file.download_url) {
-      const card = document.createElement('div');
-      card.className = 'image-card';
+    function displayImages(files) {
+      files.forEach(file => {
+        if (file.type === 'file' && file.download_url) {
+          const card = document.createElement('div');
+          card.className = 'image-card';
 
-      const img = document.createElement('img');
-      img.src = file.download_url;
-      img.alt = file.name;
+          const img = document.createElement('img');
+          img.src = file.download_url;
+          img.alt = file.name;
 
-      const button = document.createElement('button');
-      button.textContent = 'Set as Homepage Image';
-      button.onclick = () => updateSelectedImage(file.download_url);
+          const button = document.createElement('button');
+          button.textContent = 'Set as Homepage Image';
+          button.onclick = () => updateSelectedImage(file.download_url);
 
-      card.appendChild(img);
-      card.appendChild(button);
-      imageGrid.appendChild(card);
+          card.appendChild(img);
+          card.appendChild(button);
+          imageGrid.appendChild(card);
+        }
+      });
     }
-  });
-}
 
-async function updateSelectedImage(imageUrl) {
-  // Corrected variable names to match the declared ones
-  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}`;
-  const base64Content = btoa(JSON.stringify({ imageUrl }));
-  const response = await fetch(url, {
-    method: 'PUT',
-    headers: {
-      'Authorization': `token ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: 'Update selected image',
-      content: base64Content,
-      branch,
-    }),
-  });
-  if (response.ok) {
-    alert('Homepage image updated!');
-  } else {
-    alert('Failed to update the image.');
-  }
-}
+    async function updateSelectedImage(imageUrl) {
+      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}`;
+      
+      // Construct the base64-encoded content
+      const content = JSON.stringify({ imageUrl });
+      const base64Content = btoa(content);
 
-fetchGitHubFiles();
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `token ${token}`,  // Ensure token is correct
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Update selected image',
+          content: base64Content,
+          branch,
+        }),
+      });
 
+      // Check if the response is successful
+      if (response.ok) {
+        alert('Homepage image updated!');
+      } else {
+        // Capture and log error details
+        const errorData = await response.json();
+        console.error('Failed to update the image:', errorData);
+        alert('Failed to update the image. Check the console for details.');
+      }
+    }
+
+    fetchGitHubFiles();
   </script>
 </body>
 </html>
