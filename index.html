@@ -29,23 +29,45 @@
   <div id="imageContainer"></div>
 
   <script>
-    // Get the selected image URL from local storage
-    const selectedImage = localStorage.getItem('selectedImage');
-    const container = document.getElementById('imageContainer');
+    const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
+    const repoName = 'ecom-db'; // Replace with your repository name
+    const jsonPath = 'selected-image.json'; // Replace with your JSON file path
+    const branch = 'main'; // Replace with your branch name
 
-    if (selectedImage) {
-      // Display the selected image
-      const img = document.createElement('img');
-      img.src = selectedImage;
-      img.alt = 'Selected Homepage Image';
-      container.appendChild(img);
-    } else {
-      // Show a message if no image is selected
-      const message = document.createElement('p');
-      message.textContent = 'No image selected for the homepage.';
-      message.className = 'no-image';
-      container.appendChild(message);
+    async function fetchSelectedImage() {
+      const url = `https://raw.githubusercontent.com/${repoOwner}/${repoName}/${branch}/${jsonPath}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Failed to fetch selected image.');
+        }
+        const data = await response.json();
+        displayImage(data.imageUrl);
+      } catch (error) {
+        console.error(error);
+        const container = document.getElementById('imageContainer');
+        container.textContent = 'Failed to load the image.';
+      }
     }
+
+    function displayImage(imageUrl) {
+      const container = document.getElementById('imageContainer');
+      container.innerHTML = ''; // Clear previous content
+
+      if (imageUrl) {
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Selected Homepage Image';
+        container.appendChild(img);
+      } else {
+        const message = document.createElement('p');
+        message.textContent = 'No image selected for the homepage.';
+        message.className = 'no-image';
+        container.appendChild(message);
+      }
+    }
+
+    fetchSelectedImage();
   </script>
 </body>
 </html>
