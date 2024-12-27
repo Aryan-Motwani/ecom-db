@@ -58,19 +58,20 @@
     const imageGrid = document.getElementById('imageGrid');
 
     async function fetchGitHubFiles() {
-      const url = `https://api.github.com/repos/${owner}/${repo}/contents/${folderPath}?ref=${branch}`;
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error('Failed to fetch images.');
-        }
-        const files = await response.json();
-        displayImages(files);
-      } catch (error) {
-        console.error(error);
-        imageGrid.textContent = 'Failed to load images.';
-      }
+  const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}?ref=${branch}`;
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error('Failed to fetch images.');
     }
+    const files = await response.json();
+    displayImages(files);
+  } catch (error) {
+    console.error(error);
+    imageGrid.textContent = 'Failed to load images.';
+  }
+}
+
 
     function displayImages(files) {
       files.forEach(file => {
