@@ -49,13 +49,19 @@
   <h1>Admin Panel</h1>
   <div class="image-grid" id="imageGrid"></div>
 
-  <script>
-    const repoOwner = 'aryan-motwani';  // Replace with your GitHub username
-    const repoName = 'ecom-db';         // Replace with your repository name
-    const jsonPath = 'selected-image.json'; // Path to the JSON file
-    const branch = 'main';              // Replace with your branch name
-    const token = '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'; // Replace with your GitHub token
-    const folderPath = 'images';        // Folder path where your images are stored
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    // Supabase configuration
+    const supabaseUrl = 'https://xoxzdjzrdyisyobvwjxc.supabase.co'; // Replace with your Supabase project URL
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhveHpkanpyZHlpc3lvYnZ3anhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE0MTk5MjYsImV4cCI6MjA0Njk5NTkyNn0.rGA8I9v3CZ35-bVj71-RAghjv3DqxG06T_Wo3W1ulps'; // Replace with your Supabase API key
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // GitHub configuration
+    const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
+    const repoName = 'ecom-db'; // Replace with your repository name
+    const folderPath = 'images'; // Replace with your GitHub folder path
+    const branch = 'main'; // Replace with your branch name
 
     const imageGrid = document.getElementById('imageGrid');
 
@@ -96,33 +102,20 @@
     }
 
     async function updateSelectedImage(imageUrl) {
-      const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${jsonPath}`;
-      
-      // Construct the base64-encoded content
-      const content = JSON.stringify({ imageUrl });
-      const base64Content = btoa(content);
+      try {
+        const { data, error } = await supabase
+          .from('selected_image') // Replace with your Supabase table name
+          .upsert({ id: 1, image_url: imageUrl }); // Replace 'id' and 'image_url' with your column names
 
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `token ${token}`,  // Ensure token is correct
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: 'Update selected image',
-          content: base64Content,
-          branch,
-        }),
-      });
-
-      // Check if the response is successful
-      if (response.ok) {
-        alert('Homepage image updated!');
-      } else {
-        // Capture and log error details
-        const errorData = await response.json();
-        console.error('Failed to update the image:', errorData);
-        alert('Failed to update the image. Check the console for details.');
+        if (error) {
+          console.error('Error updating image in Supabase:', error);
+          alert('Failed to update the image.');
+        } else {
+          alert('Homepage image updated!');
+        }
+      } catch (err) {
+        console.error('Unexpected error:', err);
+        alert('Failed to update the image.');
       }
     }
 
