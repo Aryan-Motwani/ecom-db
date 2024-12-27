@@ -1,4 +1,56 @@
-const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .image-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Panel</h1>
+  <div class="image-grid" id="imageGrid"></div>
+
+  <script>
+    const repoOwner = 'aryan-motwani'; // Replace with your GitHub username
 const repoName = 'ecom-db'; // Replace with your repository name
 const jsonPath = 'selected-image.json'; // Replace with your JSON file path
 const branch = 'main'; // Replace with your branch name
@@ -68,3 +120,7 @@ async function updateSelectedImage(imageUrl) {
 }
 
 fetchGitHubFiles();
+
+  </script>
+</body>
+</html>
